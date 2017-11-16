@@ -1,4 +1,4 @@
-mod vm;
+pub mod vm;
 
 #[cfg(test)]
 mod tests {
