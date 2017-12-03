@@ -1,20 +1,21 @@
 use std::collections::HashMap;
 use std::mem::transmute;
 
+use Program;
+
 #[cfg(test)]
 mod vm_test;
 
-type Program = Vec<Command>;
 const SIGNALING_NAN_MASK: u64 = 0x7FF8000000000000;
 
-pub struct Machine {
+pub struct MooMachine {
     program: Program,
     registers: HashMap<u64,u64>,
     program_counter: u64,
 }
-impl Machine {
+impl MooMachine {
     pub fn new(program: Program) -> Self {
-        Machine{
+        MooMachine{
             program: program,
             registers: HashMap::new(),
             program_counter: 0,
