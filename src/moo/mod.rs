@@ -11,7 +11,7 @@ pub fn parse_program<R: Read>(r: R) -> Result<Program, MooParseError> {
     for instruction in source.split(';') {
         let params: Vec<_> = instruction.split(' ').collect();
         match &*params[0].to_lowercase().trim() {
-            i @ "fadd" | "fsub" | "fmul" | "fdiv" => {
+            i @ "fadd" | i @ "fsub" | i @ "fmul" | i @ "fdiv" => {
                 if let (p1, p2, p3 @ Param::Register(_)) = parse_three_params(params)? {
                     match i {
                         "fadd" => program.push(Command::FAdd(p1, p2, p3)),
