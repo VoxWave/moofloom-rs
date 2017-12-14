@@ -9,7 +9,7 @@ pub fn parse_program<R: Read>(mut r: R) -> Result<Program, MooParseError> {
     let mut program = Vec::new();
 
     for instruction in source.split(';') {
-        let params: Vec<_> = instruction.split(' ').collect();
+        let params: Vec<_> = instruction.trim().split(' ').collect();
         match &*params[0].to_lowercase().trim() {
             i @ "fadd" | i @ "fsub" | i @ "fmul" | i @ "fdiv" => {
                 if let (p1, p2, p3 @ Param::Register(_)) = parse_three_params(&params)? {
@@ -25,7 +25,9 @@ pub fn parse_program<R: Read>(mut r: R) -> Result<Program, MooParseError> {
                 }
             },
             "load" => {
-                return Err(MooParseError::CommandNotFound(instruction.to_string()));
+                if let (p1, p2 @ Param::Register(_)) = parse_two_params(&params)? {
+                    program.push(Command::Load(p1, p2));
+                }
             },
             _ => return Err(MooParseError::CommandNotFound(instruction.to_string())),
         }
@@ -39,6 +41,16 @@ pub fn parse_three_params(params: &Vec<&str>) -> Result<(Param, Param, Param), M
         let param2 = parse_param(params[2])?;
         let param3 = parse_param(params[3])?;
         Ok((param1, param2, param3))
+    } else {
+        Err(MooParseError::InvalidParamAmount)
+    }
+}
+
+pub fn parse_two_params(params: &Vec<&str>) -> Result<(Param, Param), MooParseError> {
+    if params.len() == 3 {
+        let param1 = parse_param(params[1])?;
+        let param2 = parse_param(params[2])?;
+        Ok((param1, param2))
     } else {
         Err(MooParseError::InvalidParamAmount)
     }

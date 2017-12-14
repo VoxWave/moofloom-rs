@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::mem::transmute;
 use std::ops::{Add, Sub, Mul};
 
 use Program;
@@ -55,7 +54,6 @@ impl MooMachine {
                 FConstant(what) => {
                     self.store_float(what, into);
                 }
-                _ => unimplemented!("this type of loading is unimplemented"),
             }
         } else {
             panic!("Load target was not a register.");
@@ -84,7 +82,6 @@ impl MooMachine {
         match param {
             Register(register) => self.load_float_from_register(register),
             FConstant(float) => float,
-            _ => panic!("a parameter could not be used as a float"),
         }
     }
 
