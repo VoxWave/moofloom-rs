@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::mem::transmute;
+use std::ops::{Add, Sub, Mul};
 
 use Program;
 
@@ -33,10 +34,14 @@ impl MooMachine {
         }
 
         match self.program[pc] {
-            FAdd(a, b, into) => self.float_add(a, b, into),
-            FSub(a, b, into) => self.float_sub(a, b, into), 
-            FMul(a, b, into) => self.float_mul(a, b, into),
-            FDiv(a, b, into) => self.float_div(a, b, into),
+            FAdd(a, b, into) => self.float_op(f64::add, "addition", a, b, into),
+            FSub(a, b, into) => self.float_op(f64::sub, "substraction", a, b, into),
+            FMul(a, b, into) => self.float_op(f64::mul, "multiplication", a, b, into),
+            FDiv(a, b, into) => self.float_op(|a, b| if b == 0. {
+                panic!("Float division by a zero");
+            } else {
+                a / b
+            }, "division", a, b, into),
             Load(what, into) => self.load(what, into),
         }
     }
@@ -46,7 +51,7 @@ impl MooMachine {
         if let Register(into) = into {
             match what {
                 Register(what) => {
-                    let a = *self.registers.get(&what).unwrap_or(&0); 
+                    let a = *self.registers.get(&what).unwrap_or(&0);
                     self.registers.insert(into, a);
                 },
                 fConstant(what) => {
@@ -59,50 +64,16 @@ impl MooMachine {
         }
     }
 
-    fn float_add(&mut self, a: Param, b: Param, into: Param) {
+    fn float_op<F>(&mut self, op: F, op_name: &str, a: Param, b: Param, into: Param)
+        where F: Fn(f64, f64) -> f64
+    {
         use self::Param::*;
         if let Register(into) = into {
             let a = self.get_float(a);
             let b = self.get_float(b);
-            self.store_float(a+b, into);
+            self.store_float(op(a, b), into);
         } else {
-            panic!("The target parameter of float addition wasn't a register.");
-        }
-    }
-
-    fn float_sub(&mut self, a: Param, b: Param, into: Param) {
-        use self::Param::*;
-        if let Register(into) = into {
-            let a = self.get_float(a);
-            let b = self.get_float(b);
-            self.store_float(a-b, into);
-        } else {
-            panic!("The target parameter of float addition wasn't a register.");
-        }
-    }
-
-    fn float_mul(&mut self, a: Param, b: Param, into: Param) {
-        use self::Param::*;
-        if let Register(into) = into {
-            let a = self.get_float(a);
-            let b = self.get_float(b);
-            self.store_float(a*b, into);
-        } else {
-            panic!("The target parameter of float addition wasn't a register.");
-        }
-    }
-
-    fn float_div(&mut self, a: Param, b: Param, into: Param) {
-        use self::Param::*;
-        if let Register(into) = into {
-            let a = self.get_float(a);
-            let b = self.get_float(b);
-            if b == 0. {
-                panic!("Float divide by zero");
-            }
-            self.store_float(a/b, into);
-        } else {
-            panic!("The target parameter of float division wasn't a register.");
+            panic!("The target parameter of float {} wasn't a register.", op_name);
         }
     }
 
@@ -142,8 +113,8 @@ impl MooMachine {
 #[derive(Clone, Copy)]
 pub enum Command {
     FAdd(Param, Param, Param),
-    FSub(Param, Param, Param), 
-    FMul(Param, Param, Param), 
+    FSub(Param, Param, Param),
+    FMul(Param, Param, Param),
     FDiv(Param, Param, Param),
     Load(Param, Param),
 }
