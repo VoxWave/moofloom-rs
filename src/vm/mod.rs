@@ -7,8 +7,6 @@ use Program;
 #[cfg(test)]
 mod vm_test;
 
-const SIGNALING_NAN_MASK: u64 = 0x7FF8000000000000;
-
 pub struct MooMachine {
     program: Program,
     registers: HashMap<u64,u64>,
@@ -78,10 +76,7 @@ impl MooMachine {
     }
 
     fn store_float(&mut self, what:f64, into: u64) {
-        let what: u64 = unsafe {
-            transmute(what)
-        };
-        self.registers.insert(into, what);
+        self.registers.insert(into, what.to_bits());
     }
 
     fn get_float(&self, param: Param) -> f64 {
@@ -95,12 +90,7 @@ impl MooMachine {
 
     fn load_float_from_register(&self, register: u64) -> f64 {
         let val = self.registers.get(&register).unwrap_or(&0);
-        if val & SIGNALING_NAN_MASK == SIGNALING_NAN_MASK {
-            panic!("tried to load signaling NaN");
-        }
-        let val: f64 = unsafe {
-            transmute(val)
-        };
+        let val = f64::from_bits(*val);
         if val.is_nan() {
             panic!("tried to load nan");
         } else if val.is_infinite() {
