@@ -52,7 +52,7 @@ pub fn parse_param(param: &str) -> Result<Param, MooParseError> {
             .map_err(|_| MooParseError::InvalidParam(param.to_string())) 
     } else if param.ends_with('f') {
         param[..(param.len()-1)].parse()
-            .map(Param::fConstant)
+            .map(Param::FConstant)
             .map_err(|_| MooParseError::InvalidParam(param.to_string()))
     } else {
         Err(MooParseError::InvalidParam(param.to_string()))
