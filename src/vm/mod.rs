@@ -151,7 +151,3 @@ pub enum Command {
 pub enum Param {
     Register(u64), fConstant(f64),
 }
-
-pub struct MooParser {
-
-}
