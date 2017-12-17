@@ -1,2 +1,2 @@
-load 0.524, R0;
-fadd 1, R0, R2;
+load 0.524f, R0;
+fadd 1f, R0, R2;

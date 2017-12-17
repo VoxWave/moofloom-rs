@@ -3,9 +3,16 @@ use std::io::Read;
 use Program;
 use vm::{Command, Param};
 
+#[cfg(test)]
+mod parser_test;
+
 pub fn parse_program<R: Read>(mut r: R) -> Result<Program, MooParseError> {
     let mut source = String::new();
     r.read_to_string(&mut source).expect("IO error! Reading source file into string failed");
+    parse_program_from_string(source)
+}
+
+pub fn parse_program_from_string(source: String) -> Result<Program, MooParseError> {
     let mut program = Vec::new();
 
     for instruction in source.split(';') {
