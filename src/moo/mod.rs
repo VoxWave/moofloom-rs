@@ -78,6 +78,7 @@ pub fn parse_param(param: &str) -> Result<Param, MooParseError> {
     }
 }
 
+#[derive(Debug)]
 pub enum MooParseError {
     CommandNotFound(String), 
     IOError(::std::io::Error), 

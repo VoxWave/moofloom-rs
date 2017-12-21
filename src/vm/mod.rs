@@ -97,7 +97,7 @@ impl MooMachine {
     }
 }
 ///General order of the parameters is (what, where)
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum Command {
     FAdd(Param, Param, Param),
     FSub(Param, Param, Param),
@@ -105,7 +105,7 @@ pub enum Command {
     FDiv(Param, Param, Param),
     Load(Param, Param),
 }
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum Param {
     Register(u64), FConstant(f64),
 }
