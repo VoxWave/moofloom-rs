@@ -37,28 +37,28 @@ fn invalid_param_test_1() {
 }
 
 #[test]
-fn this_should_not_parse_2() {
+fn invalid_param_test_2() {
     if let Ok(a) = parse_param("1.45ff") {
         panic!("\"1.45ff\" was parsed into {:?}", a);
     }
 }
 
 #[test]
-fn this_should_not_parse_3() {
+fn invalid_param_test_3() {
     if let Ok(a) = parse_param("1.53f053") {
         panic!("\"1.53f053\" was parsed into {:?}", a);
     }
 }
 
 #[test]
-fn this_should_not_parse_4() {
+fn invalid_param_test_4() {
     if let Ok(a) = parse_param("R1.5f") {
         panic!("\"R1.5f\" was parsed into {:?}", a);
     }
 }
 
 #[test]
-fn this_should_not_parse_5() {
+fn invalid_param_test_5() {
     if let Ok(a) = parse_param("10.053") {
         panic!("\"10.053\" was parsed into {:?}", a);
     }
