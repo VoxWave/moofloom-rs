@@ -22,11 +22,9 @@ fn these_should_parse_into_float_params() {
     }
 }
 
-#[ignore]
-#[test]
-fn invalid_param_test_1() {
-    match parse_param("1.1.1254f") {
-        Ok(a) => panic!("\"1.1.1254f\" was parsed into {:?}", a),
+fn invalid_param_check(param: &str) {
+    match parse_param(param) {
+        Ok(a) => panic!("\"{}\" was parsed into {:?}", param, a),
         Err(e) => {
             match e {
                 MooParseError::InvalidParam(_) => {},
@@ -37,17 +35,18 @@ fn invalid_param_test_1() {
 }
 
 #[test]
+fn invalid_param_test_1() {
+    invalid_param_check("1.1.1254f");
+}
+
+#[test]
 fn invalid_param_test_2() {
-    if let Ok(a) = parse_param("1.45ff") {
-        panic!("\"1.45ff\" was parsed into {:?}", a);
-    }
+    invalid_param_check("1.45ff");
 }
 
 #[test]
 fn invalid_param_test_3() {
-    if let Ok(a) = parse_param("1.53f053") {
-        panic!("\"1.53f053\" was parsed into {:?}", a);
-    }
+    invalid_param_check("1.53f053");
 }
 
 #[test]
