@@ -1,25 +1,27 @@
 use moo::{parse_program, parse_program_from_string, parse_param, MooParseError};
 use vm::Param;
 
-#[test]
-fn these_should_parse_into_float_params() {
-    if let Ok(Param::FConstant(f)) = parse_param("1.045f") {
-        assert_eq!(f, 1.045f64);
+fn valid_float_param_check(param: &str, expected_float: f64) {
+    if let Ok(Param::FConstant(f)) = parse_param(param) {
+        assert_eq!(f, expected_float);
     } else {
-        panic!();
-    };
-
-    if let Ok(Param::FConstant(f)) = parse_param("   20.22586f  \n") {
-        assert_eq!(f, 20.22586f64);
-    } else {
-        panic!();
-    };
-
-    if let Ok(Param::FConstant(f)) = parse_param("1000f") {
-        assert_eq!(f, 1000f64);
-    } else {
-        panic!();
+        panic!("{} did not parse into a float", param);
     }
+}
+
+#[test]
+fn valid_float_param_1() {
+    valid_float_param_check("1.045f", 1.045f64);
+}
+
+#[test]
+fn valid_float_param_2() {
+    valid_float_param_check("   20.22586f  \n", 20.22586f64);
+}
+
+#[test]
+fn valid_float_param_3() {
+    valid_float_param_check("1000f", 1000f64);
 }
 
 fn invalid_param_check(param: &str) {
@@ -51,14 +53,10 @@ fn invalid_param_test_3() {
 
 #[test]
 fn invalid_param_test_4() {
-    if let Ok(a) = parse_param("R1.5f") {
-        panic!("\"R1.5f\" was parsed into {:?}", a);
-    }
+    invalid_param_check("R1.5f");
 }
 
 #[test]
 fn invalid_param_test_5() {
-    if let Ok(a) = parse_param("10.053") {
-        panic!("\"10.053\" was parsed into {:?}", a);
-    }
+    invalid_param_check("10.053");
 }
