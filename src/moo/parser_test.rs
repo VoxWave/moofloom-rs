@@ -62,7 +62,7 @@ fn invalid_param_test_5() {
 }
 
 #[test]
-fn example_program_test() {
+fn example_program_parsing_test() {
     let source = r#"fadd 1f 2f R0;"#;
     let program = parse_program_from_string(source).unwrap();
     assert_eq!(program, vec![Command::FAdd(Param::FConstant(1.), Param::FConstant(2.), Param::Register(0))]);
