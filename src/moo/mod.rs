@@ -9,14 +9,14 @@ mod parser_test;
 pub fn parse_program<R: Read>(mut r: R) -> Result<Program, MooParseError> {
     let mut source = String::new();
     r.read_to_string(&mut source)?;
-    parse_program_from_string(source)
+    parse_program_from_string(&source)
 }
 
-pub fn parse_program_from_string(source: String) -> Result<Program, MooParseError> {
+pub fn parse_program_from_string(source: &str) -> Result<Program, MooParseError> {
     let mut program = Vec::new();
 
-    for instruction in source.split(';') {
-        let params: Vec<_> = instruction.trim().split(' ').collect();
+    for instruction in source.split(';').map(|s| s.trim()).filter(|s| !s.is_empty()) {
+        let params: Vec<_> = instruction.split(' ').collect();
         match &*params[0].to_lowercase().trim() {
             i @ "fadd" | i @ "fsub" | i @ "fmul" | i @ "fdiv" => {
                 if let (p1, p2, p3 @ Param::Register(_)) = parse_three_params(&params)? {

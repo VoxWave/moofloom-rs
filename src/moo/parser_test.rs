@@ -1,5 +1,5 @@
 use moo::{parse_program, parse_program_from_string, parse_param, MooParseError};
-use vm::Param;
+use vm::{Command, Param};
 
 fn valid_float_param_check(param: &str, expected_float: f64) {
     if let Ok(Param::FConstant(f)) = parse_param(param) {
@@ -62,3 +62,8 @@ fn invalid_param_test_5() {
 }
 
 #[test]
+fn example_program_test() {
+    let source = r#"fadd 1f 2f R0;"#;
+    let program = parse_program_from_string(source).unwrap();
+    assert_eq!(program, vec![Command::FAdd(Param::FConstant(1.), Param::FConstant(2.), Param::Register(0))]);
+}
