@@ -60,3 +60,5 @@ fn invalid_param_test_4() {
 fn invalid_param_test_5() {
     invalid_param_check("10.053");
 }
+
+#[test]

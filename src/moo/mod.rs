@@ -1,4 +1,4 @@
-use std::io::Read;
+use std::io::{self, Read};
 
 use Program;
 use vm::{Command, Param};
@@ -8,7 +8,7 @@ mod parser_test;
 
 pub fn parse_program<R: Read>(mut r: R) -> Result<Program, MooParseError> {
     let mut source = String::new();
-    r.read_to_string(&mut source).expect("IO error! Reading source file into string failed");
+    r.read_to_string(&mut source)?;
     parse_program_from_string(source)
 }
 
@@ -85,4 +85,11 @@ pub enum MooParseError {
     InvalidParamAmount,
     InvalidParam(String),
     InvalidSyntax(String),
+}
+
+
+impl From<io::Error> for MooParseError {
+    fn from(err: io::Error) -> Self {
+        MooParseError::IOError(err)
+    }
 }
