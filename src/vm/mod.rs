@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::ops::{Add, Sub, Mul};
 
+use common::{Sink, Source};
+
 use Program;
 
 #[cfg(test)]
@@ -10,13 +12,17 @@ pub struct MooMachine {
     program: Program,
     registers: HashMap<u64,u64>,
     program_counter: u64,
+    input: Vec<Box<Source<u64>>>,
+    output: Vec<Box<Sink<u64>>>,
 }
 impl MooMachine {
-    pub fn new(program: Program) -> Self {
-        MooMachine{
+    pub fn new(program: Program, input: Vec<Box<Source<u64>>>, output: Vec<Box<Sink<u64>>>) -> Self {
+        MooMachine {
             program: program,
             registers: HashMap::new(),
             program_counter: 0,
+            input,
+            output,
         }
     }
 
@@ -40,6 +46,7 @@ impl MooMachine {
                 a / b
             }, "division", a, b, into),
             Load(what, into) => self.load(what, into),
+            _ => {},
         }
     }
 
@@ -54,6 +61,7 @@ impl MooMachine {
                 FConstant(what) => {
                     self.store_float(what, into);
                 }
+                _ => unimplemented!(),
             }
         } else {
             panic!("Load target was not a register.");
@@ -82,6 +90,7 @@ impl MooMachine {
         match param {
             Register(register) => self.load_float_from_register(register),
             FConstant(float) => float,
+            _ => unimplemented!(),
         }
     }
 
@@ -99,6 +108,14 @@ impl MooMachine {
 ///General order of the parameters is (what, where)
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Command {
+    IAdd(Param, Param, Param),
+    ISub(Param, Param, Param),
+    IMul(Param, Param, Param),
+    IDiv(Param, Param, Param),
+    UAdd(Param, Param, Param),
+    USub(Param, Param, Param),
+    UMul(Param, Param, Param),
+    UDiv(Param, Param, Param),
     FAdd(Param, Param, Param),
     FSub(Param, Param, Param),
     FMul(Param, Param, Param),
@@ -107,5 +124,5 @@ pub enum Command {
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Param {
-    Register(u64), FConstant(f64),
+    Register(u64), FConstant(f64), IConstant(i64), UConstant(u64), Input(u64), Output(u64)
 }
