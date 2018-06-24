@@ -94,3 +94,16 @@ fn load_parsing_test() {
     let program = parse_program_from_string(source).unwrap();
     assert_eq!(program, vec![Command::Load(Param::FConstant(1.), Param::Register(0))]);
 }
+
+#[test]
+fn combined_program_parsing_test() {
+    let source = "fadd 1f 2f R0;\nfsub 1f 2f R0;\nfmul 1f 2f R0;\nfdiv 1f 2f R0;\nload 1f R0;\n";
+    let program = parse_program_from_string(source).unwrap();
+    assert_eq!(program, vec![
+        Command::FAdd(Param::FConstant(1.), Param::FConstant(2.), Param::Register(0)),
+        Command::FSub(Param::FConstant(1.), Param::FConstant(2.), Param::Register(0)),
+        Command::FMul(Param::FConstant(1.), Param::FConstant(2.), Param::Register(0)),
+        Command::FDiv(Param::FConstant(1.), Param::FConstant(2.), Param::Register(0)),
+        Command::Load(Param::FConstant(1.), Param::Register(0)),
+    ]);
+}
