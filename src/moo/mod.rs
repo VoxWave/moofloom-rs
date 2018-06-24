@@ -87,7 +87,6 @@ pub enum MooParseError {
     InvalidSyntax(String),
 }
 
-
 impl From<io::Error> for MooParseError {
     fn from(err: io::Error) -> Self {
         MooParseError::IOError(err)
