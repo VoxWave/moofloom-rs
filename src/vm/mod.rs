@@ -45,6 +45,14 @@ impl MooMachine {
             } else {
                 a / b
             }, "division", a, b, into),
+            UAdd(a, b, into) => self.unsigned_integer_op(u64::add, "addition", a, b, into),
+            USub(a, b, into) => self.unsigned_integer_op(u64::sub, "substraction", a, b, into),
+            UMul(a, b, into) => self.unsigned_integer_op(u64::mul, "multiplication", a, b, into),
+            UDiv(a, b, into) => self.unsigned_integer_op(|a, b| if b == 0 {
+                panic!("Unsigned integer division by a zero");
+            } else {
+
+            }, "division", a, b, into),
             Load(what, into) => self.load(what, into),
             _ => {},
         }
@@ -79,6 +87,12 @@ impl MooMachine {
         } else {
             panic!("The target parameter of float {} wasn't a register.", op_name);
         }
+    }
+
+    fn unsigned_integer_op<F>(&mut self, op: F, op_name: &str, a: Param, b: Param, into: Param)
+        where F: Fn(u64, u64) -> u64
+    {
+        
     }
 
     fn store_float(&mut self, what:f64, into: u64) {
