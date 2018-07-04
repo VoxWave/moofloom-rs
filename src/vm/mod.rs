@@ -112,21 +112,24 @@ impl MooMachine {
                 self.registers.insert(into, what.to_bits());
             },
             Output(into) => self.output.get(into as usize).unwrap().put(what.to_bits()),
+            _ => panic!("tried to store a float into something that cannot store floats"),
         }
     }
 
     fn get_float(&self, param: Param) -> f64 {
         use self::Param::*;
         match param {
-            Register(register) => self.load_float_from_register(register),
+            Register(register) => Self::transmute_to_float(*self.registers.get(&register).unwrap_or(&0)),
+            Input(channel) => Self::transmute_to_float(self.input.get(channel as usize).unwrap().take().unwrap()),
             FConstant(float) => float,
+            IConstant(integer) => integer as f64,
+            UConstant(integer) => integer as f64,
             _ => unimplemented!(),
         }
     }
 
-    fn load_float_from_register(&self, register: u64) -> f64 {
-        let val = self.registers.get(&register).unwrap_or(&0);
-        let val = f64::from_bits(*val);
+    fn transmute_to_float(val: u64) -> f64 {
+        let val = f64::from_bits(val);
         if val.is_nan() {
             panic!("tried to load nan");
         } else if val.is_infinite() {
