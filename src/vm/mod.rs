@@ -75,7 +75,7 @@ impl MooMachine {
                     self.registers.insert(into, a);
                 },
                 FConstant(what) => {
-                    self.store_float(what, into);
+                    self.store_float(what, Register(into));
                 }
                 _ => unimplemented!(),
             }
@@ -89,21 +89,46 @@ impl MooMachine {
     {
         let a = self.get_float(a);
         let b = self.get_float(b);
-        self.store_float(op(a,b), into)
+        self.store_float(op(a,b), into);
     }
 
-    // fn unsigned_integer_op<F>(&mut self, op: F, op_name: &str, a: Param, b: Param, into: Param)
-    //     where F: Fn(u64, u64) -> u64
-    // {
-    //     use self::Param::*;
-    //     if let Register()
-    // }
+     fn unsigned_integer_op<F>(&mut self, op: F, op_name: &str, a: Param, b: Param, into: Param)
+         where F: Fn(u64, u64) -> u64
+     {
+         let a = self.get_unsigned_integer(a);
+         let b = self.get_uinteger(b);
+         self.store_uinteger(op(a,b), into);
+     }
     
-    // fn signed_integer_op<F>(&mut self, op: F, op_name: &str, a: Param, b: Param, into: Param)
-    //     where F: Fn(i64, i64) -> i64
-    // {
-        
-    // }
+     fn signed_integer_op<F>(&mut self, op: F, op_name: &str, a: Param, b: Param, into: Param)
+         where F: Fn(i64, i64) -> i64
+     {
+         let a = self.get_integer(a);
+         let b = self.get_integer(b);
+         self.store_uinteger(op(a,b), into);
+     }
+
+    fn store_unsigned_integer(&mut self, what: u64, into: Param) {
+        use self::Param::*;
+        match into {
+            Register(into) => {
+                self.register.insert(into, what);
+            },
+            Output(into) => self.output.get(into as usize).unwrap().put(what),
+        }
+    }
+
+    fn get_unsigned_integer(&self, param: Param) -> u64 {
+
+    }
+
+    fn store_signed_integer(&mut self, what: u64, into: Param) {
+
+    }
+
+    fn get_signed_integer(&self, param: Param) -> i64 {
+
+    }
 
     fn store_float(&mut self, what:f64, into: Param) {
         use self::Param::*;
