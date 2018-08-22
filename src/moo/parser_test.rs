@@ -1,4 +1,4 @@
-use moo::{parse_program, parse_program_from_string, parse_param, MooParseError};
+use moo::{parse_param, parse_program, parse_program_from_string, MooParseError};
 use vm::{Command, Param};
 
 fn valid_float_param_check(param: &str, expected_float: f64) {
@@ -29,10 +29,10 @@ fn invalid_param_check(param: &str) {
         Ok(a) => panic!("\"{}\" was parsed into {:?}", param, a),
         Err(e) => {
             match e {
-                MooParseError::InvalidParam(_) => {},
+                MooParseError::InvalidParam(_) => {}
                 _ => panic!("invalid error {:?} was returned", e),
             };
-        },
+        }
     };
 }
 
@@ -65,35 +65,66 @@ fn invalid_param_test_5() {
 fn fadd_parsing_test() {
     let source = "fadd 1f 2f R0;";
     let program = parse_program_from_string(source).unwrap();
-    assert_eq!(program, vec![Command::FAdd(Param::FConstant(1.), Param::FConstant(2.), Param::Register(0))]);
+    assert_eq!(
+        program,
+        vec![Command::FAdd(
+            Param::FConstant(1.),
+            Param::FConstant(2.),
+            Param::Register(0),
+        )]
+    );
 }
 
 #[test]
 fn fsub_parsing_test() {
     let source = "fsub 1f 2f R0;";
     let program = parse_program_from_string(source).unwrap();
-    assert_eq!(program, vec![Command::FSub(Param::FConstant(1.), Param::FConstant(2.), Param::Register(0))]);
+    assert_eq!(
+        program,
+        vec![Command::FSub(
+            Param::FConstant(1.),
+            Param::FConstant(2.),
+            Param::Register(0),
+        )]
+    );
 }
 
 #[test]
 fn fmul_parsing_test() {
     let source = "fmul 1f 2f R0";
     let program = parse_program_from_string(source).unwrap();
-    assert_eq!(program, vec![Command::FMul(Param::FConstant(1.), Param::FConstant(2.), Param::Register(0))]);
+    assert_eq!(
+        program,
+        vec![Command::FMul(
+            Param::FConstant(1.),
+            Param::FConstant(2.),
+            Param::Register(0),
+        )]
+    );
 }
 
 #[test]
 fn fdiv_parsing_test() {
     let source = "fdiv 1f 2f R0;";
     let program = parse_program_from_string(source).unwrap();
-    assert_eq!(program, vec![Command::FDiv(Param::FConstant(1.), Param::FConstant(2.), Param::Register(0))]);
+    assert_eq!(
+        program,
+        vec![Command::FDiv(
+            Param::FConstant(1.),
+            Param::FConstant(2.),
+            Param::Register(0),
+        )]
+    );
 }
 
 #[test]
 fn load_parsing_test() {
     let source = "load 1f R0;";
     let program = parse_program_from_string(source).unwrap();
-    assert_eq!(program, vec![Command::Load(Param::FConstant(1.), Param::Register(0))]);
+    assert_eq!(
+        program,
+        vec![Command::Load(Param::FConstant(1.), Param::Register(0))]
+    );
 }
 
 #[test]
@@ -104,11 +135,30 @@ fn program_with_all_commands_parsing_test() {
 fdiv 1f 2f R0;
 load 1f R0;"#;
     let program = parse_program_from_string(source).unwrap();
-    assert_eq!(program, vec![
-        Command::FAdd(Param::FConstant(1.), Param::FConstant(2.), Param::Register(0)),
-        Command::FSub(Param::FConstant(1.), Param::FConstant(2.), Param::Register(0)),
-        Command::FMul(Param::FConstant(1.), Param::FConstant(2.), Param::Register(0)),
-        Command::FDiv(Param::FConstant(1.), Param::FConstant(2.), Param::Register(0)),
-        Command::Load(Param::FConstant(1.), Param::Register(0)),
-    ]);
+    assert_eq!(
+        program,
+        vec![
+            Command::FAdd(
+                Param::FConstant(1.),
+                Param::FConstant(2.),
+                Param::Register(0),
+            ),
+            Command::FSub(
+                Param::FConstant(1.),
+                Param::FConstant(2.),
+                Param::Register(0),
+            ),
+            Command::FMul(
+                Param::FConstant(1.),
+                Param::FConstant(2.),
+                Param::Register(0),
+            ),
+            Command::FDiv(
+                Param::FConstant(1.),
+                Param::FConstant(2.),
+                Param::Register(0),
+            ),
+            Command::Load(Param::FConstant(1.), Param::Register(0)),
+        ]
+    );
 }

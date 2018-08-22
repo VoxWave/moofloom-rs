@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::ops::{Add, Sub, Mul};
+use std::ops::{Add, Mul, Sub};
 
 use common::{Sink, Source};
 
@@ -10,13 +10,17 @@ mod vm_test;
 
 pub struct MooMachine {
     program: Program,
-    registers: HashMap<u64,u64>,
+    registers: HashMap<u64, u64>,
     program_counter: u64,
     input: Vec<Box<Source<u64>>>,
     output: Vec<Box<Sink<u64>>>,
 }
 impl MooMachine {
-    pub fn new(program: Program, input: Vec<Box<Source<u64>>>, output: Vec<Box<Sink<u64>>>) -> Self {
+    pub fn new(
+        program: Program,
+        input: Vec<Box<Source<u64>>>,
+        output: Vec<Box<Sink<u64>>>,
+    ) -> Self {
         MooMachine {
             program: program,
             registers: HashMap::new(),
@@ -40,29 +44,53 @@ impl MooMachine {
             FAdd(a, b, into) => self.float_op(f64::add, "addition", a, b, into),
             FSub(a, b, into) => self.float_op(f64::sub, "substraction", a, b, into),
             FMul(a, b, into) => self.float_op(f64::mul, "multiplication", a, b, into),
-            FDiv(a, b, into) => self.float_op(|a, b| if b == 0. {
-                panic!("Float division by a zero");
-            } else {
-                a / b
-            }, "division", a, b, into),
+            FDiv(a, b, into) => self.float_op(
+                |a, b| {
+                    if b == 0. {
+                        panic!("Float division by a zero");
+                    } else {
+                        a / b
+                    }
+                },
+                "division",
+                a,
+                b,
+                into,
+            ),
             UAdd(a, b, into) => self.unsigned_integer_op(u64::add, "addition", a, b, into),
             USub(a, b, into) => self.unsigned_integer_op(u64::sub, "substraction", a, b, into),
             UMul(a, b, into) => self.unsigned_integer_op(u64::mul, "multiplication", a, b, into),
-            UDiv(a, b, into) => self.unsigned_integer_op(|a, b| if b == 0 {
-                panic!("Unsigned integer division by a zero");
-            } else {
-                a / b
-            }, "division", a, b, into),
+            UDiv(a, b, into) => self.unsigned_integer_op(
+                |a, b| {
+                    if b == 0 {
+                        panic!("Unsigned integer division by a zero");
+                    } else {
+                        a / b
+                    }
+                },
+                "division",
+                a,
+                b,
+                into,
+            ),
             IAdd(a, b, into) => self.signed_integer_op(i64::add, "addition", a, b, into),
             ISub(a, b, into) => self.signed_integer_op(i64::sub, "substraction", a, b, into),
             IMul(a, b, into) => self.signed_integer_op(i64::mul, "multiplication", a, b, into),
-            IDiv(a, b, into) => self.signed_integer_op(|a, b| if b == 0 {
-                panic!("Unsigned integer division by a zero");
-            } else {
-                a / b
-            }, "division", a, b, into),
+            IDiv(a, b, into) => self.signed_integer_op(
+                |a, b| {
+                    if b == 0 {
+                        panic!("Unsigned integer division by a zero");
+                    } else {
+                        a / b
+                    }
+                },
+                "division",
+                a,
+                b,
+                into,
+            ),
             Load(what, into) => self.load(what, into),
-            _ => {},
+            _ => {}
         }
     }
 
@@ -73,7 +101,7 @@ impl MooMachine {
                 Register(what) => {
                     let a = *self.registers.get(&what).unwrap_or(&0);
                     self.registers.insert(into, a);
-                },
+                }
                 FConstant(what) => {
                     self.store_float(what, into);
                 }
@@ -85,11 +113,12 @@ impl MooMachine {
     }
 
     fn float_op<F>(&mut self, op: F, op_name: &str, a: Param, b: Param, into: Param)
-        where F: Fn(f64, f64) -> f64
+    where
+        F: Fn(f64, f64) -> f64,
     {
         let a = self.get_float(a);
         let b = self.get_float(b);
-        self.store_float(op(a,b), into)
+        self.store_float(op(a, b), into)
     }
 
     // fn unsigned_integer_op<F>(&mut self, op: F, op_name: &str, a: Param, b: Param, into: Param)
@@ -98,19 +127,19 @@ impl MooMachine {
     //     use self::Param::*;
     //     if let Register()
     // }
-    
+
     // fn signed_integer_op<F>(&mut self, op: F, op_name: &str, a: Param, b: Param, into: Param)
     //     where F: Fn(i64, i64) -> i64
     // {
-        
+
     // }
 
-    fn store_float(&mut self, what:f64, into: Param) {
+    fn store_float(&mut self, what: f64, into: Param) {
         use self::Param::*;
         match into {
             Register(into) => {
                 self.registers.insert(into, what.to_bits());
-            },
+            }
             Output(into) => self.output.get(into as usize).unwrap().put(what.to_bits()),
             _ => panic!("tried to store a float into something that cannot store floats"),
         }
@@ -119,8 +148,12 @@ impl MooMachine {
     fn get_float(&self, param: Param) -> f64 {
         use self::Param::*;
         match param {
-            Register(register) => Self::transmute_to_float(*self.registers.get(&register).unwrap_or(&0)),
-            Input(channel) => Self::transmute_to_float(self.input.get(channel as usize).unwrap().take().unwrap()),
+            Register(register) => {
+                Self::transmute_to_float(*self.registers.get(&register).unwrap_or(&0))
+            }
+            Input(channel) => {
+                Self::transmute_to_float(self.input.get(channel as usize).unwrap().take().unwrap())
+            }
             FConstant(float) => float,
             IConstant(integer) => integer as f64,
             UConstant(integer) => integer as f64,
@@ -157,5 +190,10 @@ pub enum Command {
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Param {
-    Register(u64), FConstant(f64), IConstant(i64), UConstant(u64), Input(u64), Output(u64)
+    Register(u64),
+    FConstant(f64),
+    IConstant(i64),
+    UConstant(u64),
+    Input(u64),
+    Output(u64),
 }
