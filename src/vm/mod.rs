@@ -103,7 +103,7 @@ impl MooMachine {
                     self.registers.insert(into, a);
                 }
                 FConstant(what) => {
-                    self.store_float(what, into);
+                    self.store_float(what, Register(into));
                 }
                 _ => unimplemented!(),
             }
@@ -118,21 +118,47 @@ impl MooMachine {
     {
         let a = self.get_float(a);
         let b = self.get_float(b);
-        self.store_float(op(a, b), into)
+        self.store_float(op(a,b), into);
     }
 
-    // fn unsigned_integer_op<F>(&mut self, op: F, op_name: &str, a: Param, b: Param, into: Param)
-    //     where F: Fn(u64, u64) -> u64
-    // {
-    //     use self::Param::*;
-    //     if let Register()
-    // }
+     fn unsigned_integer_op<F>(&mut self, op: F, op_name: &str, a: Param, b: Param, into: Param)
+         where F: Fn(u64, u64) -> u64
+     {
+         let a = self.get_unsigned_integer(a);
+         let b = self.get_unsigned_integer(b);
+         self.store_unsigned_integer(op(a,b), into);
+     }
+    
+     fn signed_integer_op<F>(&mut self, op: F, op_name: &str, a: Param, b: Param, into: Param)
+         where F: Fn(i64, i64) -> i64
+     {
+         let a = self.get_signed_integer(a);
+         let b = self.get_signed_integer(b);
+         self.store_signed_integer(op(a,b), into);
+     }
 
-    // fn signed_integer_op<F>(&mut self, op: F, op_name: &str, a: Param, b: Param, into: Param)
-    //     where F: Fn(i64, i64) -> i64
-    // {
+    fn store_unsigned_integer(&mut self, what: u64, into: Param) {
+        use self::Param::*;
+        match into {
+            Register(into) => {
+                self.registers.insert(into, what);
+            },
+            Output(into) => self.output.get_mut(into as usize).unwrap().put(what),
+            _ => panic!("tried to store an unsigned integer into a {:?}", into),
+        }
+    }
 
-    // }
+    fn get_unsigned_integer(&self, param: Param) -> u64 {
+        unimplemented!();
+    }
+
+    fn store_signed_integer(&mut self, what: i64, into: Param) {
+        unimplemented!();
+    }
+
+    fn get_signed_integer(&self, param: Param) -> i64 {
+        unimplemented!();
+    }
 
     fn store_float(&mut self, what: f64, into: Param) {
         use self::Param::*;
@@ -140,19 +166,19 @@ impl MooMachine {
             Register(into) => {
                 self.registers.insert(into, what.to_bits());
             }
-            Output(into) => self.output.get(into as usize).unwrap().put(what.to_bits()),
+            Output(into) => self.output.get_mut(into as usize).unwrap().put(what.to_bits()),
             _ => panic!("tried to store a float into something that cannot store floats"),
         }
     }
 
-    fn get_float(&self, param: Param) -> f64 {
+    fn get_float(&mut self, param: Param) -> f64 {
         use self::Param::*;
         match param {
             Register(register) => {
                 Self::transmute_to_float(*self.registers.get(&register).unwrap_or(&0))
             }
             Input(channel) => {
-                Self::transmute_to_float(self.input.get(channel as usize).unwrap().take().unwrap())
+                Self::transmute_to_float(self.input.get_mut(channel as usize).unwrap().take().unwrap())
             }
             FConstant(float) => float,
             IConstant(integer) => integer as f64,
