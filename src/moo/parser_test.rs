@@ -1,4 +1,4 @@
-use moo::{parse_program_from_string, parse_param, MooParseError};
+use moo::{parse_param, parse_program_from_string, MooParseError};
 use vm::{Command, Param};
 
 fn valid_float_param_check(param: &str, expected_float: f64) {

@@ -118,31 +118,33 @@ impl MooMachine {
     {
         let a = self.get_float(a);
         let b = self.get_float(b);
-        self.store_float(op(a,b), into);
+        self.store_float(op(a, b), into);
     }
 
-     fn unsigned_integer_op<F>(&mut self, op: F, op_name: &str, a: Param, b: Param, into: Param)
-         where F: Fn(u64, u64) -> u64
-     {
-         let a = self.get_unsigned_integer(a);
-         let b = self.get_unsigned_integer(b);
-         self.store_unsigned_integer(op(a,b), into);
-     }
-    
-     fn signed_integer_op<F>(&mut self, op: F, op_name: &str, a: Param, b: Param, into: Param)
-         where F: Fn(i64, i64) -> i64
-     {
-         let a = self.get_signed_integer(a);
-         let b = self.get_signed_integer(b);
-         self.store_signed_integer(op(a,b), into);
-     }
+    fn unsigned_integer_op<F>(&mut self, op: F, op_name: &str, a: Param, b: Param, into: Param)
+    where
+        F: Fn(u64, u64) -> u64,
+    {
+        let a = self.get_unsigned_integer(a);
+        let b = self.get_unsigned_integer(b);
+        self.store_unsigned_integer(op(a, b), into);
+    }
+
+    fn signed_integer_op<F>(&mut self, op: F, op_name: &str, a: Param, b: Param, into: Param)
+    where
+        F: Fn(i64, i64) -> i64,
+    {
+        let a = self.get_signed_integer(a);
+        let b = self.get_signed_integer(b);
+        self.store_signed_integer(op(a, b), into);
+    }
 
     fn store_unsigned_integer(&mut self, what: u64, into: Param) {
         use self::Param::*;
         match into {
             Register(into) => {
                 self.registers.insert(into, what);
-            },
+            }
             Output(into) => self.output.get_mut(into as usize).unwrap().put(what),
             _ => panic!("tried to store an unsigned integer into a {:?}", into),
         }
@@ -166,7 +168,10 @@ impl MooMachine {
             Register(into) => {
                 self.registers.insert(into, what.to_bits());
             }
-            Output(into) => self.output.get_mut(into as usize).unwrap().put(what.to_bits()),
+            Output(into) => self.output
+                .get_mut(into as usize)
+                .unwrap()
+                .put(what.to_bits()),
             _ => panic!("tried to store a float into something that cannot store floats"),
         }
     }
@@ -177,9 +182,13 @@ impl MooMachine {
             Register(register) => {
                 Self::transmute_to_float(*self.registers.get(&register).unwrap_or(&0))
             }
-            Input(channel) => {
-                Self::transmute_to_float(self.input.get_mut(channel as usize).unwrap().take().unwrap())
-            }
+            Input(channel) => Self::transmute_to_float(
+                self.input
+                    .get_mut(channel as usize)
+                    .unwrap()
+                    .take()
+                    .unwrap(),
+            ),
             FConstant(float) => float,
             IConstant(integer) => integer as f64,
             UConstant(integer) => integer as f64,
