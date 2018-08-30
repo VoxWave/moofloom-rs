@@ -1,7 +1,7 @@
 use std::io::{self, Read};
 
-use Program;
 use vm::{Command, Param};
+use Program;
 
 #[cfg(test)]
 mod parser_test;
@@ -15,7 +15,11 @@ pub fn parse_program<R: Read>(mut r: R) -> Result<Program, MooParseError> {
 pub fn parse_program_from_string(source: &str) -> Result<Program, MooParseError> {
     let mut program = Vec::new();
 
-    for instruction in source.split(';').map(|s| s.trim()).filter(|s| !s.is_empty()) {
+    for instruction in source
+        .split(';')
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty())
+    {
         let params: Vec<_> = instruction.split(' ').collect();
         match &*params[0].to_lowercase().trim() {
             i @ "fadd" | i @ "fsub" | i @ "fmul" | i @ "fdiv" => {
@@ -28,17 +32,20 @@ pub fn parse_program_from_string(source: &str) -> Result<Program, MooParseError>
                         _ => unreachable!(),
                     }
                 } else {
-                    return Err(MooParseError::InvalidSyntax(format!("Third parameter in \"{}\" should be a register", instruction.to_string())));
+                    return Err(MooParseError::InvalidSyntax(format!(
+                        "Third parameter in \"{}\" should be a register",
+                        instruction.to_string()
+                    )));
                 }
-            },
+            }
             "load" => {
                 if let (p1, p2 @ Param::Register(_)) = parse_two_params(&params)? {
                     program.push(Command::Load(p1, p2));
                 }
-            },
+            }
             _ => return Err(MooParseError::CommandNotFound(instruction.to_string())),
         }
-    };
+    }
     Ok(program)
 }
 
@@ -66,11 +73,13 @@ pub fn parse_two_params(params: &Vec<&str>) -> Result<(Param, Param), MooParseEr
 pub fn parse_param(param: &str) -> Result<Param, MooParseError> {
     let param = param.trim().to_lowercase();
     if param.starts_with('r') {
-        param[1..].parse()
+        param[1..]
+            .parse()
             .map(Param::Register)
-            .map_err(|_| MooParseError::InvalidParam(param.to_string())) 
+            .map_err(|_| MooParseError::InvalidParam(param.to_string()))
     } else if param.ends_with('f') {
-        param[..(param.len()-1)].parse()
+        param[..(param.len() - 1)]
+            .parse()
             .map(Param::FConstant)
             .map_err(|_| MooParseError::InvalidParam(param.to_string()))
     } else {
@@ -80,8 +89,8 @@ pub fn parse_param(param: &str) -> Result<Param, MooParseError> {
 
 #[derive(Debug)]
 pub enum MooParseError {
-    CommandNotFound(String), 
-    IOError(::std::io::Error), 
+    CommandNotFound(String),
+    IOError(::std::io::Error),
     InvalidParamAmount,
     InvalidParam(String),
     InvalidSyntax(String),
