@@ -96,16 +96,16 @@ impl MooMachine {
          where F: Fn(u64, u64) -> u64
      {
          let a = self.get_unsigned_integer(a);
-         let b = self.get_uinteger(b);
-         self.store_uinteger(op(a,b), into);
+         let b = self.get_unsigned_integer(b);
+         self.store_unsigned_integer(op(a,b), into);
      }
     
      fn signed_integer_op<F>(&mut self, op: F, op_name: &str, a: Param, b: Param, into: Param)
          where F: Fn(i64, i64) -> i64
      {
-         let a = self.get_integer(a);
-         let b = self.get_integer(b);
-         self.store_uinteger(op(a,b), into);
+         let a = self.get_signed_integer(a);
+         let b = self.get_signed_integer(b);
+         self.store_signed_integer(op(a,b), into);
      }
 
     fn store_unsigned_integer(&mut self, what: u64, into: Param) {
@@ -122,8 +122,14 @@ impl MooMachine {
 
     }
 
-    fn store_signed_integer(&mut self, what: u64, into: Param) {
-
+    fn store_signed_integer(&mut self, what: i64, into: Param) {
+//        use self::Param::*;
+//        match into {
+//            Register(into) => {
+//                self.register.insert(into, what);
+//            },
+//            Output(into) => self.output.get(into as usize).unwrap().put(what),
+//        }
     }
 
     fn get_signed_integer(&self, param: Param) -> i64 {
