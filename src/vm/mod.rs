@@ -150,16 +150,39 @@ impl MooMachine {
         }
     }
 
-    fn get_unsigned_integer(&self, param: Param) -> u64 {
-        unimplemented!();
+    fn get_unsigned_integer(&mut self, param: Param) -> u64 {
+        use self::Param::*;
+        match param {
+            Register(register) => *self.registers.get(&register).unwrap_or(&0),
+            Input(channel) => self.input.get_mut(channel as usize).unwrap().take().unwrap(),
+            FConstant(float) => float as u64,
+            UConstant(integer) => integer,
+            IConstant(integer) => integer as u64,
+            _ => panic!("tried to get an integer from {:?}", param),
+        }
     }
 
     fn store_signed_integer(&mut self, what: i64, into: Param) {
-        unimplemented!();
+        use self::Param::*;
+        match into {
+            Register(into) => {
+                self.registers.insert(into,transmute_from_signed(what));
+            }
+            Output(into) => self.output.get_mut(into as usize).unwrap().put(transmute_from_signed(what)),
+            _ => panic!("tried to store an signed integer into a {:?}", into),
+        }
     }
 
-    fn get_signed_integer(&self, param: Param) -> i64 {
-        unimplemented!();
+    fn get_signed_integer(&mut self, param: Param) -> i64 {
+        use self::Param::*;
+        match param {
+            Register(register) => transmute_to_signed(*self.registers.get(&register).unwrap_or(&0)),
+            Input(channel) => transmute_to_signed(self.input.get_mut(channel as usize).unwrap().take().unwrap()),
+            FConstant(float) => float as i64,
+            UConstant(integer) => integer as i64,
+            IConstant(integer) => integer,
+            _ => panic!("tried to get an integer from {:?}", param),
+        }
     }
 
     fn store_float(&mut self, what: f64, into: Param) {
@@ -180,9 +203,9 @@ impl MooMachine {
         use self::Param::*;
         match param {
             Register(register) => {
-                Self::transmute_to_float(*self.registers.get(&register).unwrap_or(&0))
+                transmute_to_float(*self.registers.get(&register).unwrap_or(&0))
             }
-            Input(channel) => Self::transmute_to_float(
+            Input(channel) => transmute_to_float(
                 self.input
                     .get_mut(channel as usize)
                     .unwrap()
@@ -195,17 +218,28 @@ impl MooMachine {
             _ => unimplemented!(),
         }
     }
-
-    fn transmute_to_float(val: u64) -> f64 {
-        let val = f64::from_bits(val);
-        if val.is_nan() {
-            panic!("tried to load nan");
-        } else if val.is_infinite() {
-            panic!("tried to load infinity");
-        }
-        val
-    }
 }
+
+fn transmute_to_float(val: u64) -> f64 {
+    let val = f64::from_bits(val);
+    if val.is_nan() {
+        panic!("tried to load nan");
+    } else if val.is_infinite() {
+        panic!("tried to load infinity");
+    }
+    val
+}
+
+fn transmute_to_signed(val: u64) -> i64 {
+    use std::mem::transmute;
+    unsafe{transmute(val)}
+}
+
+fn transmute_from_signed(val: i64) -> u64 {
+    use std::mem::transmute;
+    unsafe{transmute(val)}
+}
+
 ///General order of the parameters is (what, where)
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Command {
