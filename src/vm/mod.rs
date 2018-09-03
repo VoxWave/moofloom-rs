@@ -154,7 +154,12 @@ impl MooMachine {
         use self::Param::*;
         match param {
             Register(register) => *self.registers.get(&register).unwrap_or(&0),
-            Input(channel) => self.input.get_mut(channel as usize).unwrap().take().unwrap(),
+            Input(channel) => self
+                .input
+                .get_mut(channel as usize)
+                .unwrap()
+                .take()
+                .unwrap(),
             FConstant(float) => float as u64,
             UConstant(integer) => integer,
             IConstant(integer) => integer as u64,
@@ -166,9 +171,13 @@ impl MooMachine {
         use self::Param::*;
         match into {
             Register(into) => {
-                self.registers.insert(into,transmute_from_signed(what));
+                self.registers.insert(into, transmute_from_signed(what));
             }
-            Output(into) => self.output.get_mut(into as usize).unwrap().put(transmute_from_signed(what)),
+            Output(into) => self
+                .output
+                .get_mut(into as usize)
+                .unwrap()
+                .put(transmute_from_signed(what)),
             _ => panic!("tried to store an signed integer into a {:?}", into),
         }
     }
@@ -177,7 +186,13 @@ impl MooMachine {
         use self::Param::*;
         match param {
             Register(register) => transmute_to_signed(*self.registers.get(&register).unwrap_or(&0)),
-            Input(channel) => transmute_to_signed(self.input.get_mut(channel as usize).unwrap().take().unwrap()),
+            Input(channel) => transmute_to_signed(
+                self.input
+                    .get_mut(channel as usize)
+                    .unwrap()
+                    .take()
+                    .unwrap(),
+            ),
             FConstant(float) => float as i64,
             UConstant(integer) => integer as i64,
             IConstant(integer) => integer,
@@ -191,7 +206,8 @@ impl MooMachine {
             Register(into) => {
                 self.registers.insert(into, what.to_bits());
             }
-            Output(into) => self.output
+            Output(into) => self
+                .output
                 .get_mut(into as usize)
                 .unwrap()
                 .put(what.to_bits()),
@@ -202,9 +218,7 @@ impl MooMachine {
     fn get_float(&mut self, param: Param) -> f64 {
         use self::Param::*;
         match param {
-            Register(register) => {
-                transmute_to_float(*self.registers.get(&register).unwrap_or(&0))
-            }
+            Register(register) => transmute_to_float(*self.registers.get(&register).unwrap_or(&0)),
             Input(channel) => transmute_to_float(
                 self.input
                     .get_mut(channel as usize)
@@ -232,12 +246,12 @@ fn transmute_to_float(val: u64) -> f64 {
 
 fn transmute_to_signed(val: u64) -> i64 {
     use std::mem::transmute;
-    unsafe{transmute(val)}
+    unsafe { transmute(val) }
 }
 
 fn transmute_from_signed(val: i64) -> u64 {
     use std::mem::transmute;
-    unsafe{transmute(val)}
+    unsafe { transmute(val) }
 }
 
 ///General order of the parameters is (what, where)
