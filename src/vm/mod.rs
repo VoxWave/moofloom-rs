@@ -96,6 +96,19 @@ impl MooMachine {
 
     fn load(&mut self, what: Param, into: Param) {
         use self::Param::*;
+        let what = match what {
+            Register(what) => *self.registers.get(&what).unwrap_or(&0),
+            FConstant(what) => what,
+            IConstant(what) => {},
+            UConstant(what) => {},
+            Input(what) => {},
+            _ => panic!()
+        }
+        match into {
+            Register(into) -> {},
+            Output(into) -> {},
+            _ => panic!("Load target was not a register."),
+        }
         if let Register(into) = into {
             match what {
                 Register(what) => {
@@ -108,7 +121,7 @@ impl MooMachine {
                 _ => unimplemented!(),
             }
         } else {
-            panic!("Load target was not a register.");
+
         }
     }
 
