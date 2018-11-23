@@ -1,7 +1,5 @@
 mod common;
 pub mod moo;
+pub mod program;
 pub mod vm;
 
-use vm::Command;
-
-type Program = Vec<Command>;
