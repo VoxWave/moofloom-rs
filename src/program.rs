@@ -8,6 +8,12 @@ pub struct Program {
     labels: HashMap<String, usize>,
 }
 
+impl Program {
+    pub fn get_address(&self, label: &str) -> usize {
+        *self.labels.get(label).unwrap()
+    }
+}
+
 impl Index<usize> for Program {
     type Output = Command;
     

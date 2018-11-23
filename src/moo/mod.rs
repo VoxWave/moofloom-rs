@@ -1,7 +1,8 @@
 use std::io::{self, Read};
+use std::collections::HashMap;
 
 use vm::{Command, Param};
-use Program;
+use program::Program;
 
 #[cfg(test)]
 mod parser_test;
@@ -14,6 +15,7 @@ pub fn parse_program<R: Read>(mut r: R) -> Result<Program, MooParseError> {
 
 pub fn parse_program_from_string(source: &str) -> Result<Program, MooParseError> {
     let mut program = Vec::new();
+    let mut labels = HashMap::new();
 
     for instruction in source
         .split(';')
