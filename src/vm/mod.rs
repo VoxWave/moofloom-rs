@@ -104,7 +104,7 @@ impl MooMachine {
                 let what = self.get_unsigned_integer(what);
                 self.store_unsigned_integer(what, into);
             },
-            _ => panic!()
+            _ => panic!(),
         }
     }
 
