@@ -3,7 +3,7 @@ use std::ops::{Add, Mul, Sub};
 
 use common::{Sink, Source};
 
-use Program;
+use program::Program;
 
 #[cfg(test)]
 mod vm_test;

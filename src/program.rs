@@ -9,8 +9,19 @@ pub struct Program {
 }
 
 impl Program {
+    pub fn new(program: Vec<Command>, labels: HashMap<String, usize>) -> Self {
+        Program {
+            program,
+            labels,
+        }
+    }
+
     pub fn get_address(&self, label: &str) -> usize {
         *self.labels.get(label).unwrap()
+    }
+
+    pub fn len(&self) -> usize {
+        self.program.len()
     }
 }
 

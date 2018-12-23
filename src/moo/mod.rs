@@ -14,41 +14,52 @@ pub fn parse_program<R: Read>(mut r: R) -> Result<Program, MooParseError> {
 }
 
 pub fn parse_program_from_string(source: &str) -> Result<Program, MooParseError> {
-    let mut program = Vec::new();
+    let mut instructions = Vec::new();
     let mut labels = HashMap::new();
 
-    for instruction in source
+    for line in source
         .split(';')
         .map(|s| s.trim())
         .filter(|s| !s.is_empty())
-    {
-        let params: Vec<_> = instruction.split(' ').collect();
-        match &*params[0].to_lowercase().trim() {
-            i @ "fadd" | i @ "fsub" | i @ "fmul" | i @ "fdiv" => {
-                if let (p1, p2, p3 @ Param::Register(_)) = parse_three_params(&params)? {
-                    match i {
-                        "fadd" => program.push(Command::FAdd(p1, p2, p3)),
-                        "fsub" => program.push(Command::FSub(p1, p2, p3)),
-                        "fmul" => program.push(Command::FMul(p1, p2, p3)),
-                        "fdiv" => program.push(Command::FDiv(p1, p2, p3)),
-                        _ => unreachable!(),
-                    }
-                } else {
-                    return Err(MooParseError::InvalidSyntax(format!(
-                        "Third parameter in \"{}\" should be a register",
-                        instruction.to_string()
-                    )));
-                }
-            }
-            "load" => {
-                if let (p1, p2 @ Param::Register(_)) = parse_two_params(&params)? {
-                    program.push(Command::Load(p1, p2));
-                }
-            }
-            _ => return Err(MooParseError::CommandNotFound(instruction.to_string())),
+    {   
+        let label_and_instruction: Vec<_> = line.split(':').map(|s| s.trim()).collect();
+        match label_and_instruction.len() {
+            1 => {},
+            2 => {},
+            _ => {},
         }
     }
-    Ok(program)
+    Ok(Program::new(instructions, labels))
+}
+
+fn parse_instruction(instruction: &str) -> Result<Command, MooParseError> {
+    let params: Vec<_> = instruction.split(' ').collect();
+    match &*params[0].to_lowercase().trim() {
+        i @ "fadd" | i @ "fsub" | i @ "fmul" | i @ "fdiv" => {
+            if let (p1, p2, p3 @ Param::Register(_)) = parse_three_params(&params)? {
+                match i {
+                    "fadd" => Ok(Command::FAdd(p1, p2, p3)),
+                    "fsub" => Ok(Command::FSub(p1, p2, p3)),
+                    "fmul" => Ok(Command::FMul(p1, p2, p3)),
+                    "fdiv" => Ok(Command::FDiv(p1, p2, p3)),
+                    _ => unreachable!(),
+                }
+            } else {
+                Err(MooParseError::InvalidSyntax(format!(
+                    "Third parameter in \"{}\" should be a register",
+                    instruction.to_string()
+                )))
+            }
+        },
+        "load" => {
+            match parse_two_params(&params)? {
+                (p1, p2 @ Param::Register(_)) => {
+                    Ok(Command::Load(p1, p2))
+                }
+            }
+        },
+        _ => Err(MooParseError::CommandNotFound(instruction.to_string())),
+    }
 }
 
 pub fn parse_three_params(params: &Vec<&str>) -> Result<(Param, Param, Param), MooParseError> {
