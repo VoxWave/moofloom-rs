@@ -16,6 +16,7 @@ pub fn parse_program<R: Read>(mut r: R) -> Result<Program, MooParseError> {
 pub fn parse_program_from_string(source: &str) -> Result<Program, MooParseError> {
     let mut instructions = Vec::new();
     let mut labels = HashMap::new();
+    let mut line_count = 0;
 
     for line in source
         .split(';')
@@ -24,10 +25,16 @@ pub fn parse_program_from_string(source: &str) -> Result<Program, MooParseError>
     {   
         let label_and_instruction: Vec<_> = line.split(':').map(|s| s.trim()).collect();
         match label_and_instruction.len() {
-            1 => {},
-            2 => {},
-            _ => {},
+            1 => {
+                instructions.push(parse_instruction(label_and_instruction[0])?);
+            },
+            2 => {
+                labels.insert(label_and_instruction[0].to_string(), line_count);
+                instructions.push(parse_instruction(label_and_instruction[1])?);
+            },
+            _ => return Err(MooParseError::InvalidLineStructure(line.to_string())),
         }
+        line_count += 1;
     }
     Ok(Program::new(instructions, labels))
 }
@@ -56,6 +63,7 @@ fn parse_instruction(instruction: &str) -> Result<Command, MooParseError> {
                 (p1, p2 @ Param::Register(_)) => {
                     Ok(Command::Load(p1, p2))
                 }
+                _ => Err(MooParseError::InvalidParam(instruction.to_string())),
             }
         },
         _ => Err(MooParseError::CommandNotFound(instruction.to_string())),
@@ -107,6 +115,7 @@ pub enum MooParseError {
     InvalidParamAmount,
     InvalidParam(String),
     InvalidSyntax(String),
+    InvalidLineStructure(String),
 }
 
 impl From<io::Error> for MooParseError {

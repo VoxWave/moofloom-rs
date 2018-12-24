@@ -3,6 +3,7 @@ use std::ops::Index;
 
 use vm::Command;
 
+#[derive(Debug, PartialEq)]
 pub struct Program {
     program: Vec<Command>,
     labels: HashMap<String, usize>,

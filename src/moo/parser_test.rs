@@ -1,5 +1,8 @@
+use std::collections::HashMap;
+
 use moo::{parse_param, parse_program_from_string, MooParseError};
 use vm::{Command, Param};
+use program::Program;
 
 fn valid_float_param_check(param: &str, expected_float: f64) {
     if let Ok(Param::FConstant(f)) = parse_param(param) {
@@ -65,13 +68,17 @@ fn invalid_param_test_5() {
 fn fadd_parsing_test() {
     let source = "fadd 1f 2f R0;";
     let program = parse_program_from_string(source).unwrap();
-    assert_eq!(
-        program,
+    let expected_program = Program::new(
         vec![Command::FAdd(
             Param::FConstant(1.),
             Param::FConstant(2.),
             Param::Register(0),
-        )]
+        )],
+        HashMap::new(),
+    );
+    assert_eq!(
+        program,
+        expected_program,
     );
 }
 
@@ -79,13 +86,17 @@ fn fadd_parsing_test() {
 fn fsub_parsing_test() {
     let source = "fsub 1f 2f R0;";
     let program = parse_program_from_string(source).unwrap();
-    assert_eq!(
-        program,
+    let expected_program = Program::new(
         vec![Command::FSub(
             Param::FConstant(1.),
             Param::FConstant(2.),
             Param::Register(0),
-        )]
+        )],
+        HashMap::new(),
+    );
+    assert_eq!(
+        program,
+        expected_program,
     );
 }
 
@@ -93,13 +104,17 @@ fn fsub_parsing_test() {
 fn fmul_parsing_test() {
     let source = "fmul 1f 2f R0";
     let program = parse_program_from_string(source).unwrap();
-    assert_eq!(
-        program,
+    let expected_program = Program::new(
         vec![Command::FMul(
             Param::FConstant(1.),
             Param::FConstant(2.),
             Param::Register(0),
-        )]
+        )],
+        HashMap::new(),
+    );
+    assert_eq!(
+        program,
+        expected_program,
     );
 }
 
@@ -107,13 +122,17 @@ fn fmul_parsing_test() {
 fn fdiv_parsing_test() {
     let source = "fdiv 1f 2f R0;";
     let program = parse_program_from_string(source).unwrap();
-    assert_eq!(
-        program,
+    let expected_program = Program::new(
         vec![Command::FDiv(
             Param::FConstant(1.),
             Param::FConstant(2.),
             Param::Register(0),
-        )]
+        )],
+        HashMap::new(),
+    );
+    assert_eq!(
+        program,
+        expected_program,
     );
 }
 
@@ -121,9 +140,13 @@ fn fdiv_parsing_test() {
 fn load_parsing_test() {
     let source = "load 1f R0;";
     let program = parse_program_from_string(source).unwrap();
+    let expected_program = Program::new(
+        vec![Command::Load(Param::FConstant(1.), Param::Register(0))],
+        HashMap::new(),
+    );
     assert_eq!(
         program,
-        vec![Command::Load(Param::FConstant(1.), Param::Register(0))]
+        expected_program,
     );
 }
 
@@ -135,8 +158,7 @@ fn program_with_all_commands_parsing_test() {
 fdiv 1f 2f R0;
 load 1f R0;"#;
     let program = parse_program_from_string(source).unwrap();
-    assert_eq!(
-        program,
+    let expected_program = Program::new(
         vec![
             Command::FAdd(
                 Param::FConstant(1.),
@@ -159,6 +181,11 @@ load 1f R0;"#;
                 Param::Register(0),
             ),
             Command::Load(Param::FConstant(1.), Param::Register(0)),
-        ]
+        ],
+        HashMap::new(),
+    );
+    assert_eq!(
+        program,
+        expected_program,
     );
 }
