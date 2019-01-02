@@ -189,3 +189,49 @@ load 1f R0;"#;
         expected_program,
     );
 }
+
+#[test]
+fn label_parsing_test() {
+    let source = r#"label1:fadd 1f 2f R0;label2 :
+    fsub 1f 2f R0
+; label 3:  fmul 1f 2f R0;
+fdiv 1f 2f R0;
+label5: load 1f R0;"#;
+    let program = parse_program_from_string(source).unwrap();
+    let mut expected_labels = HashMap::new();
+    expected_labels.insert("label1".to_string(), 0);
+    expected_labels.insert("label2".to_string(), 1);
+    expected_labels.insert("label 3".to_string(), 2);
+    expected_labels.insert("label5".to_string(), 4);
+    let expected_program = Program::new(
+        vec![
+            Command::FAdd(
+                Param::FConstant(1.),
+                Param::FConstant(2.),
+                Param::Register(0),
+            ),
+            Command::FSub(
+                Param::FConstant(1.),
+                Param::FConstant(2.),
+                Param::Register(0),
+            ),
+            Command::FMul(
+                Param::FConstant(1.),
+                Param::FConstant(2.),
+                Param::Register(0),
+            ),
+            Command::FDiv(
+                Param::FConstant(1.),
+                Param::FConstant(2.),
+                Param::Register(0),
+            ),
+            Command::Load(Param::FConstant(1.), Param::Register(0)),
+        ],
+        expected_labels,
+    );
+    assert_eq!(
+        program,
+        expected_program,
+    );
+
+}
