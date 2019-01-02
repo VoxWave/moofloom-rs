@@ -240,7 +240,7 @@ fn invalid_label_test() {
     let invalid = "kokeilitko: tätä: fadd 1f 1f R0;";
     match parse_program_from_string(invalid) {
         Ok(_) => panic!("an Err should have been returned but and Ok was returned instead."),
-        Err(MooParseError::InvalidLineStructure(invalid)) => {},
+        Err(MooParseError::InvalidLineStructure(_)) => {},
         Err(e) => panic!("an Err was returned but it was the wrong kind. Err returned was {:?}", e),
     }
 }
