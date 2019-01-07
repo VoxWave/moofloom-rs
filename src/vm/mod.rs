@@ -251,7 +251,7 @@ fn transmute_from_signed(val: i64) -> u64 {
 }
 
 ///General order of the parameters is (what, where)
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Command {
     IAdd(Param, Param, Param),
     ISub(Param, Param, Param),
@@ -266,6 +266,7 @@ pub enum Command {
     FMul(Param, Param, Param),
     FDiv(Param, Param, Param),
     Load(Param, Param),
+    Jump(String),
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Param {

@@ -66,6 +66,10 @@ fn parse_instruction(instruction: &str) -> Result<Command, MooParseError> {
                 _ => Err(MooParseError::InvalidParam(instruction.to_string())),
             }
         },
+        "jump" => {
+            // We just take whatever is after the jump and trim it to make it a label.
+            Ok(Command::Jump(instruction[4..instruction.len()].trim().to_string()))
+        },
         _ => Err(MooParseError::CommandNotFound(instruction.to_string())),
     }
 }
@@ -107,6 +111,7 @@ pub fn parse_param(param: &str) -> Result<Param, MooParseError> {
         Err(MooParseError::InvalidParam(param.to_string()))
     }
 }
+
 
 #[derive(Debug)]
 pub enum MooParseError {
