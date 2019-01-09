@@ -6,18 +6,18 @@ use vm::Command;
 #[derive(Debug, PartialEq)]
 pub struct Program {
     program: Vec<Command>,
-    labels: HashMap<String, usize>,
+    labels: HashMap<String, u64>,
 }
 
 impl Program {
-    pub fn new(program: Vec<Command>, labels: HashMap<String, usize>) -> Self {
+    pub fn new(program: Vec<Command>, labels: HashMap<String, u64>) -> Self {
         Program {
             program,
             labels,
         }
     }
 
-    pub fn get_address(&self, label: &str) -> usize {
+    pub fn get_address(&self, label: &str) -> u64 {
         *self.labels.get(label).unwrap()
     }
 

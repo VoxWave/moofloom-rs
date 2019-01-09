@@ -151,7 +151,7 @@ fn load_parsing_test() {
 }
 
 #[test]
-fn program_with_all_commands_parsing_test() {
+fn program_with_all_float_arithmetic_operators_and_load_parsing_test() {
     let source = r#"fadd 1f 2f R0;
     fsub 1f 2f R0
 ;   fmul 1f 2f R0;
@@ -244,3 +244,30 @@ fn invalid_label_test() {
         Err(e) => panic!("an Err was returned but it was the wrong kind. Err returned was {:?}", e),
     }
 }
+
+#[test]
+fn jump_parse_test() {
+    let source = "label1:Jump label3\n; label2 : juMp label1;\n label3     :   jump label2;";
+    let program = parse_program_from_string(source).unwrap();
+    let mut labels = HashMap::new();
+    labels.insert("label1".to_string(), 0);
+    labels.insert("label2".to_string(), 1);
+    labels.insert("label3".to_string(), 2);
+    let expected_program = Program::new(
+        vec![
+            Command::Jump("label3".to_string()),
+            Command::Jump("label1".to_string()),
+            Command::Jump("label2".to_string()),
+        ],
+        labels,
+    );
+    assert_eq!(program, expected_program);
+}
+
+//TODO: do this test once parsing for u and i arithmetic operators work
+// #[test]
+// fn big_do_everything_loop_program() {
+//     let source = r#"
+
+//     "#;
+// }
