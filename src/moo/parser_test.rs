@@ -244,3 +244,13 @@ fn invalid_label_test() {
         Err(e) => panic!("an Err was returned but it was the wrong kind. Err returned was {:?}", e),
     }
 }
+
+#[test]
+fn jump_parsing_janky_but_correct_test() {
+    let source = r#"label1: jump label3;
+        label2 :     jump    
+        label1    ;
+        
+        label3:jump label2;"#;
+    
+}
