@@ -39,8 +39,8 @@ impl MooMachine {
         if pc >= self.program.len() {
             panic!("program counter overflowed");
         }
-
-        match self.program[pc] {
+        //TODO: figure out if this clone can be removed somehow.
+        match self.program[pc].clone() {
             FAdd(a, b, into) => self.float_op(f64::add, "addition", a, b, into),
             FSub(a, b, into) => self.float_op(f64::sub, "substraction", a, b, into),
             FMul(a, b, into) => self.float_op(f64::mul, "multiplication", a, b, into),
@@ -90,7 +90,7 @@ impl MooMachine {
                 into,
             ),
             Load(what, into) => self.load(what, into),
-            //Jump(ref label) => self.jump(label),
+            Jump(ref label) => self.jump(&label),
             _ => {}
         }
     }
