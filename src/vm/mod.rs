@@ -90,8 +90,13 @@ impl MooMachine {
                 into,
             ),
             Load(what, into) => self.load(what, into),
+            //Jump(ref label) => self.jump(label),
             _ => {}
         }
+    }
+
+    fn jump(&mut self, label: &str) {
+        self.program_counter = self.program.get_address(label);
     }
 
     fn load(&mut self, what: Param, into: Param) {
