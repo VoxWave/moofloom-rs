@@ -1,9 +1,10 @@
 use common::{Sink, Source};
 use program::Program;
 use std::collections::HashMap;
+use std::mem::transmute;
 
 use super::{Command, MooMachine, Param};
-
+use crate::moo::parse_program_from_string;
 impl MooMachine {
     fn get_program(&self) -> &Program {
         &self.program
@@ -39,6 +40,21 @@ fn fadd_test() {
     machine.tick();
     assert_eq!(
         *(machine.get_registers().get(&0).unwrap()), 
-        unsafe{ std::mem::transmute(3f64) },
+        unsafe{ transmute(3f64) },
     );
+}
+
+#[test]
+fn load_float_test() {
+    let program = parse_program_from_string("load 3f R1;").unwrap();
+    let mut machine = MooMachine::new(program, Vec::new(), Vec::new());
+    assert_eq!(
+        machine.get_registers().get(&1), 
+        None,    
+    );
+    machine.tick();
+    assert_eq!(
+        *machine.get_registers().get(&1).unwrap(), 
+        unsafe{ transmute(3.) }
+    )
 }
