@@ -42,15 +42,28 @@ pub fn parse_program_from_string(source: &str) -> Result<Program, MooParseError>
 fn parse_instruction(instruction: &str) -> Result<Command, MooParseError> {
     let params: Vec<_> = instruction.split(' ').collect();
     match &*params[0].to_lowercase().trim() {
-        i @ "fadd" | i @ "fsub" | i @ "fmul" | i @ "fdiv" => {
+        i @ "fadd" | i @ "fsub" | i @ "fmul" | i @ "fdiv" |
+        i @ "iadd" | i @ "isub" | i @ "imul" | i @ "idiv" |
+        i @ "uadd" | i @ "usub" | i @ "umul" | i @ "udiv" 
+        => {
             if let (p1, p2, p3 @ Param::Register(_)) = parse_three_params(&params)? {
-                match i {
-                    "fadd" => Ok(Command::FAdd(p1, p2, p3)),
-                    "fsub" => Ok(Command::FSub(p1, p2, p3)),
-                    "fmul" => Ok(Command::FMul(p1, p2, p3)),
-                    "fdiv" => Ok(Command::FDiv(p1, p2, p3)),
+                Ok(
+                    match i {
+                    "fadd" => Command::FAdd(p1, p2, p3),
+                    "fsub" => Command::FSub(p1, p2, p3),
+                    "fmul" => Command::FMul(p1, p2, p3),
+                    "fdiv" => Command::FDiv(p1, p2, p3),
+                    "iadd" => Command::IAdd(p1, p2, p3),
+                    "isub" => Command::ISub(p1, p2, p3),
+                    "imul" => Command::IMul(p1, p2, p3),
+                    "idiv" => Command::IDiv(p1, p2, p3),
+                    "uadd" => Command::UAdd(p1, p2, p3),
+                    "usub" => Command::USub(p1, p2, p3),
+                    "umul" => Command::UMul(p1, p2, p3),
+                    "udiv" => Command::UDiv(p1, p2, p3),
                     _ => unreachable!(),
-                }
+                    }
+                )
             } else {
                 Err(MooParseError::InvalidSyntax(format!(
                     "Third parameter in \"{}\" should be a register",
@@ -106,6 +119,16 @@ pub fn parse_param(param: &str) -> Result<Param, MooParseError> {
         param[..(param.len() - 1)]
             .parse()
             .map(Param::FConstant)
+            .map_err(|_| MooParseError::InvalidParam(param.to_string()))
+    } else if param.ends_with('i'){
+        param[..(param.len() - 1)]
+            .parse()
+            .map(Param::IConstant)
+            .map_err(|_| MooParseError::InvalidParam(param.to_string()))
+    } else if param.ends_with('u'){
+        param[..(param.len() - 1)]
+            .parse()
+            .map(Param::UConstant)
             .map_err(|_| MooParseError::InvalidParam(param.to_string()))
     } else {
         Err(MooParseError::InvalidParam(param.to_string()))

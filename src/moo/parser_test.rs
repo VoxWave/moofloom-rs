@@ -191,6 +191,86 @@ load 1f R0;"#;
 }
 
 #[test]
+fn program_with_all_signed_integer_arithmetic_operators_and_load_parsing_test() {
+    let source = r#"iadd 1i 2i R0;
+    isub 1i 2i R0
+;   imul 1i 2i R0;
+idiv 1i 2i R0;
+load 1i R0;"#;
+    let program = parse_program_from_string(source).unwrap();
+    let expected_program = Program::new(
+        vec![
+            Command::IAdd(
+                Param::IConstant(1),
+                Param::IConstant(2),
+                Param::Register(0),
+            ),
+            Command::ISub(
+                Param::IConstant(1),
+                Param::IConstant(2),
+                Param::Register(0),
+            ),
+            Command::IMul(
+                Param::IConstant(1),
+                Param::IConstant(2),
+                Param::Register(0),
+            ),
+            Command::IDiv(
+                Param::IConstant(1),
+                Param::IConstant(2),
+                Param::Register(0),
+            ),
+            Command::Load(Param::IConstant(1), Param::Register(0)),
+        ],
+        HashMap::new(),
+    );
+    assert_eq!(
+        program,
+        expected_program,
+    );
+}
+
+#[test]
+fn program_with_all_unsigned_integer_arithmetic_operators_and_load_parsing_test() {
+    let source = r#"uadd 1u 2u R0;
+    usub 1u 2u R0
+;   umul 1u 2u R0;
+udiv 1u 2u R0;
+load 1u R0;"#;
+    let program = parse_program_from_string(source).unwrap();
+    let expected_program = Program::new(
+        vec![
+            Command::UAdd(
+                Param::UConstant(1),
+                Param::UConstant(2),
+                Param::Register(0),
+            ),
+            Command::USub(
+                Param::UConstant(1),
+                Param::UConstant(2),
+                Param::Register(0),
+            ),
+            Command::UMul(
+                Param::UConstant(1),
+                Param::UConstant(2),
+                Param::Register(0),
+            ),
+            Command::UDiv(
+                Param::UConstant(1),
+                Param::UConstant(2),
+                Param::Register(0),
+            ),
+            Command::Load(Param::UConstant(1), Param::Register(0)),
+        ],
+        HashMap::new(),
+    );
+    assert_eq!(
+        program,
+        expected_program,
+    );
+}
+
+#[test]
 fn label_parsing_test() {
     let source = r#"label1:fadd 1f 2f R0;label2 :
     fsub 1f 2f R0
