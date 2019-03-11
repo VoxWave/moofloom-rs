@@ -1,5 +1,8 @@
-use std::collections::HashMap;
-use std::ops::{Add, Mul, Sub};
+use std::{
+    cmp::Ordering,
+    collections::HashMap,
+    ops::{Add, Mul, Sub},
+};
 
 use common::{Sink, Source};
 
@@ -9,6 +12,7 @@ use program::Program;
 mod vm_test;
 
 pub struct MooMachine {
+    compare: Option<Ordering>,
     program: Program,
     registers: HashMap<u64, u64>,
     program_counter: u64,
@@ -22,6 +26,7 @@ impl MooMachine {
         output: Vec<Box<Sink<u64>>>,
     ) -> Self {
         MooMachine {
+            compare: None,
             program: program,
             registers: HashMap::new(),
             program_counter: 0,
@@ -57,15 +62,15 @@ impl MooMachine {
                 b,
                 into,
             ),
-            UAdd(a, b, into) => self.unsigned_integer_op(u64::add, "addition", a, b, into),
-            USub(a, b, into) => self.unsigned_integer_op(u64::sub, "substraction", a, b, into),
-            UMul(a, b, into) => self.unsigned_integer_op(u64::mul, "multiplication", a, b, into),
+            UAdd(a, b, into) => self.unsigned_integer_op(u64::wrapping_add, "addition", a, b, into),
+            USub(a, b, into) => self.unsigned_integer_op(u64::wrapping_sub, "substraction", a, b, into),
+            UMul(a, b, into) => self.unsigned_integer_op(u64::wrapping_mul, "multiplication", a, b, into),
             UDiv(a, b, into) => self.unsigned_integer_op(
                 |a, b| {
                     if b == 0 {
                         panic!("Unsigned integer division by a zero");
                     } else {
-                        a / b
+                        a.wrapping_div(b)
                     }
                 },
                 "division",
@@ -73,15 +78,15 @@ impl MooMachine {
                 b,
                 into,
             ),
-            IAdd(a, b, into) => self.signed_integer_op(i64::add, "addition", a, b, into),
-            ISub(a, b, into) => self.signed_integer_op(i64::sub, "substraction", a, b, into),
-            IMul(a, b, into) => self.signed_integer_op(i64::mul, "multiplication", a, b, into),
+            IAdd(a, b, into) => self.signed_integer_op(i64::wrapping_add, "addition", a, b, into),
+            ISub(a, b, into) => self.signed_integer_op(i64::wrapping_sub, "substraction", a, b, into),
+            IMul(a, b, into) => self.signed_integer_op(i64::wrapping_mul, "multiplication", a, b, into),
             IDiv(a, b, into) => self.signed_integer_op(
                 |a, b| {
                     if b == 0 {
                         panic!("Unsigned integer division by a zero");
                     } else {
-                        a / b
+                        a.wrapping_div(b)
                     }
                 },
                 "division",
@@ -90,13 +95,46 @@ impl MooMachine {
                 into,
             ),
             Load(what, into) => self.load(what, into),
+            ICmp(a, b) => {},
+            UCmp(a, b) => {},
+            FCmp(a, b) => {},
             Jump(ref label) => self.jump(&label),
-            _ => {}
+            JFNeg(number, ref label) => self.integer_jump_if_negative(number, &label),
+            JINeg(number, ref label) => self.float_jump_if_negative(number, &label),
+            JGre(ref label) => self.jump_if_greater(&label),
+            JLess(ref label) => self.jump_if_less(&label),
+            JEq(ref label) => self.jump_if_equal(&label),
+            JNeq(ref label) => self.jump_if_not_equal(&label),
+            _ => {},
         }
     }
 
     fn jump(&mut self, label: &str) {
         self.program_counter = self.program.get_address(label);
+    }
+
+    fn integer_jump_if_negative(&mut self, number: Param, label: &str) {
+
+    }
+
+    fn float_jump_if_negative(&mut self, number: Param, label: &str) {
+        
+    }
+
+    fn jump_if_greater(&mut self, label: &str) {
+
+    }
+
+    fn jump_if_less(&mut self, label: &str) {
+
+    }
+
+    fn jump_if_equal(&mut self, label: &str) {
+
+    }
+
+    fn jump_if_not_equal(&mut self, label: &str) {
+
     }
 
     fn load(&mut self, what: Param, into: Param) {
@@ -262,16 +300,25 @@ pub enum Command {
     ISub(Param, Param, Param),
     IMul(Param, Param, Param),
     IDiv(Param, Param, Param),
+    ICmp(Param, Param),
     UAdd(Param, Param, Param),
     USub(Param, Param, Param),
     UMul(Param, Param, Param),
     UDiv(Param, Param, Param),
+    UCmp(Param, Param),
     FAdd(Param, Param, Param),
     FSub(Param, Param, Param),
     FMul(Param, Param, Param),
     FDiv(Param, Param, Param),
+    FCmp(Param, Param),
     Load(Param, Param),
     Jump(String),
+    JFNeg(Param, String),
+    JINeg(Param, String),
+    JGre(String),
+    JLess(String),
+    JEq(String),
+    JNeq(String),
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Param {

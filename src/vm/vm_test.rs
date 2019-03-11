@@ -136,7 +136,7 @@ load 1u R0;"#;
     machine.tick();
     //TODO: I need to define what moofloom does when underflow and overflows happen. 
     //Currently it does what rust does but that's inconvenient and inconsistent.
-    assert_eq!(*machine.registers.get(&0).unwrap(), 1 - 2);
+    assert_eq!(*machine.registers.get(&0).unwrap(), 1u64.wrapping_sub(2));
     machine.tick();
     assert_eq!(*machine.registers.get(&0).unwrap(), 1 * 2);
     machine.tick();
