@@ -1,8 +1,8 @@
 use std::io::{self, Read};
 use std::collections::HashMap;
 
-use vm::{Command, Param};
-use program::Program;
+use crate::vm::{Command, Param};
+use crate::program::Program;
 
 #[cfg(test)]
 mod parser_test;

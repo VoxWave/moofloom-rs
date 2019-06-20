@@ -4,9 +4,9 @@ use std::{
     ops::{Add, Mul, Sub},
 };
 
-use common::{Sink, Source};
+use crate::common::{Sink, Source};
 
-use program::Program;
+use crate::program::Program;
 
 #[cfg(test)]
 mod vm_test;

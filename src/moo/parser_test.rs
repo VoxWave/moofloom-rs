@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use moo::{parse_param, parse_program_from_string, MooParseError};
-use vm::{Command, Param};
-use program::Program;
+use crate::moo::{parse_param, parse_program_from_string, MooParseError};
+use crate::vm::{Command, Param};
+use crate::program::Program;
 
 fn valid_float_param_check(param: &str, expected_float: f64) {
     if let Ok(Param::FConstant(f)) = parse_param(param) {

@@ -1,5 +1,5 @@
-use common::{Sink, Source};
-use program::Program;
+use crate::common::{Sink, Source};
+use crate::program::Program;
 use std::collections::HashMap;
 use std::mem::transmute;
 

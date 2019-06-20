@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::ops::Index;
 
-use vm::Command;
+use crate::vm::Command;
 
 #[derive(Debug, PartialEq)]
 pub struct Program {
