@@ -109,12 +109,16 @@ impl MooMachine {
         }
     }
 
-    fn signed_integer_compare(a: Param, b: Param) {
-
+    fn signed_integer_compare(&mut self, a: Param, b: Param) {
+        let a = self.get_signed_integer(a);
+        let b = self.get_signed_integer(b);
+        self.compare = Some(a.cmp(&b));
     }
 
-    fn unsigned_integer_compare(a: Param, b: Param) {
-
+    fn unsigned_integer_compare(&mut self, a: Param, b: Param) {
+        let a = self.get_unsigned_integer(a);
+        let b = self.get_unsigned_integer(b);
+        self.compare = Some(a.cmp(&b));
     }
 
     fn float_compare(&mut self, a: Param, b: Param) {
