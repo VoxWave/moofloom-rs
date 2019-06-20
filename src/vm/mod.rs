@@ -95,9 +95,9 @@ impl MooMachine {
                 into,
             ),
             Load(what, into) => self.load(what, into),
-            ICmp(a, b) => {},
-            UCmp(a, b) => {},
-            FCmp(a, b) => {},
+            ICmp(a, b) => self.signed_integer_compare(a, b),
+            UCmp(a, b) => self.unsigned_integer_compare(a, b),
+            FCmp(a, b) => self.float_compare(a, b),
             Jump(ref label) => self.jump(&label),
             JFNeg(number, ref label) => self.integer_jump_if_negative(number, &label),
             JINeg(number, ref label) => self.float_jump_if_negative(number, &label),
@@ -105,8 +105,24 @@ impl MooMachine {
             JLess(ref label) => self.jump_if_less(&label),
             JEq(ref label) => self.jump_if_equal(&label),
             JNeq(ref label) => self.jump_if_not_equal(&label),
-            _ => {},
+            _ => un,
         }
+    }
+
+    fn signed_integer_compare(a: Param, b: Param) {
+
+    }
+
+    fn unsigned_integer_compare(a: Param, b: Param) {
+
+    }
+
+    fn float_compare(&mut self, a: Param, b: Param) {
+        let a = self.get_float(a);
+        let b = self.get_float(b);
+        //TODO: Figure out whether panicking here is the best option.
+        let ordering = a.partial_cmp(&b).expect("the floats a and b were not comparable.");
+        self.compare = Some(ordering);
     }
 
     fn jump(&mut self, label: &str) {
