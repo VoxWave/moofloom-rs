@@ -105,7 +105,7 @@ impl MooMachine {
             JLess(ref label) => self.jump_if_less(&label),
             JEq(ref label) => self.jump_if_equal(&label),
             JNeq(ref label) => self.jump_if_not_equal(&label),
-            _ => un,
+            _ => unimplemented!(),
         }
     }
 
@@ -134,11 +134,31 @@ impl MooMachine {
     }
 
     fn integer_jump_if_negative(&mut self, number: Param, label: &str) {
-
+        use self::Param::*;
+        let number = match number {
+            Register(_) | Input(_) => {
+                self.get_signed_integer(number)
+            },
+            IConstant(what) => what,
+            _ => panic!("Invalid parameter"),
+        };
+        if number < 0 {
+            self.jump(label);
+        }
     }
 
     fn float_jump_if_negative(&mut self, number: Param, label: &str) {
-        
+        use self::Param::*;
+        let number = match number {
+            Register(_) | Input(_) => {
+                self.get_float(number)
+            },
+            FConstant(what) => what,
+            _ => panic!(),
+        };
+        if number < 0. {
+            self.jump(label);
+        }
     }
 
     fn jump_if_greater(&mut self, label: &str) {
