@@ -101,9 +101,9 @@ impl MooMachine {
             Jump(ref label) => self.jump(&label),
             JFNeg(number, ref label) => self.integer_jump_if_negative(number, &label),
             JINeg(number, ref label) => self.float_jump_if_negative(number, &label),
-            JGre(ref label) => self.jump_if_greater(&label),
-            JLess(ref label) => self.jump_if_less(&label),
-            JEq(ref label) => self.jump_if_equal(&label),
+            JGre(ref label) => self.jump_if(&label, Ordering::Greater),
+            JLess(ref label) => self.jump_if(&label, Ordering::Less),
+            JEq(ref label) => self.jump_if(&label, Ordering::Equal),
             JNeq(ref label) => self.jump_if_not_equal(&label),
             _ => unimplemented!(),
         }
@@ -161,20 +161,23 @@ impl MooMachine {
         }
     }
 
-    fn jump_if_greater(&mut self, label: &str) {
-
-    }
-
-    fn jump_if_less(&mut self, label: &str) {
-
-    }
-
-    fn jump_if_equal(&mut self, label: &str) {
-
+    fn jump_if(&mut self, label: &str, ord: Ordering) {
+        match self.compare {
+            Some(o) => {
+                if o == ord {
+                    self.jump(label);
+                }
+            },
+            None => panic!("Tried to conditional jump without comparing"),
+        }
     }
 
     fn jump_if_not_equal(&mut self, label: &str) {
-
+        match self.compare {
+            Some(Ordering::Equal) => {},
+            Some(_) => self.jump(label),
+            None => panic!("Tried to conditional jump without comparing")
+        }
     }
 
     fn load(&mut self, what: Param, into: Param) {
